@@ -7,6 +7,10 @@ import Dashboard from './pages/Dashboard'
 import Products from './pages/Products'
 import Users from './pages/Users'
 import Settings from './pages/Settings'
+import Purchases from './pages/Purchases'
+import Sales from './pages/Sales'
+import Invoices from './pages/Invoices'
+import Reports from './pages/Reports'
 
 function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -27,6 +31,10 @@ export default function App() {
           <Route path="/dashboard" element={<ProtectedRoute><AdminLayout><Dashboard /></AdminLayout></ProtectedRoute>} />
           <Route path="/products" element={<ProtectedRoute><AdminLayout><Products /></AdminLayout></ProtectedRoute>} />
           <Route path="/users" element={<ProtectedRoute><AdminLayout><Users /></AdminLayout></ProtectedRoute>} />
+          <Route path="/purchases" element={<ProtectedRoute><AdminLayout><Purchases /></AdminLayout></ProtectedRoute>} />
+          <Route path="/sales" element={<ProtectedRoute><AdminLayout><Sales /></AdminLayout></ProtectedRoute>} />
+          <Route path="/invoices" element={<ProtectedRoute><AdminLayout><Invoices /></AdminLayout></ProtectedRoute>} />
+          <Route path="/reports" element={<ProtectedRoute><AdminLayout><Reports /></AdminLayout></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><AdminLayout><Settings /></AdminLayout></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

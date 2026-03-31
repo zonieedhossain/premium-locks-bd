@@ -1,12 +1,22 @@
 import { useState } from 'react'
+import { publicApi } from '../api/publicApi'
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
+  const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
+  const [sending, setSending] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
+    setSending(true)
+    try {
+      await publicApi.sendContact(form)
+    } catch {
+      // Always show success to user even if email fails
+    } finally {
+      setSending(false)
+      setSubmitted(true)
+    }
   }
 
   return (
@@ -48,7 +58,7 @@ export default function Contact() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                 </svg>
-                <p className="text-sm font-medium">Map placeholder — Gulshan, Dhaka</p>
+                <p className="text-sm font-medium">Shekherchak, Boalia, Rajshahi</p>
               </div>
             </div>
           </div>
@@ -61,17 +71,22 @@ export default function Contact() {
                 <span className="text-5xl block mb-4">✅</span>
                 <p className="font-bold text-green-800 text-lg mb-2">Message Sent!</p>
                 <p className="text-green-600 text-sm">We'll get back to you within 24 hours.</p>
-                <button onClick={() => { setSubmitted(false); setForm({ name: '', email: '', subject: '', message: '' }) }}
+                <button onClick={() => { setSubmitted(false); setForm({ name: '', email: '', phone: '', subject: '', message: '' }) }}
                   className="mt-6 text-brand-600 hover:underline text-sm font-medium">Send another message</button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
-                {([['name', 'Full Name', 'text', 'John Doe'], ['email', 'Email Address', 'email', 'john@example.com'], ['subject', 'Subject', 'text', 'Question about padlocks']] as const).map(([field, label, type, placeholder]) => (
+                {([
+                  ['name', 'Full Name', 'text', 'John Doe'],
+                  ['email', 'Email Address', 'email', 'john@example.com'],
+                  ['phone', 'Phone Number', 'tel', '+880 1XXX-XXXXXX'],
+                  ['subject', 'Subject', 'text', 'Question about padlocks'],
+                ] as const).map(([field, label, type, placeholder]) => (
                   <div key={field}>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
                     <input
                       type={type}
-                      required
+                      required={field !== 'phone'}
                       value={form[field as keyof typeof form]}
                       onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
                       placeholder={placeholder}
@@ -90,8 +105,8 @@ export default function Contact() {
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
                   />
                 </div>
-                <button type="submit" className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-colors text-sm">
-                  Send Message
+                <button type="submit" disabled={sending} className="w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white font-bold py-3.5 rounded-xl transition-colors text-sm">
+                  {sending ? 'Sending...' : 'Send Message'}
                 </button>
               </form>
             )}

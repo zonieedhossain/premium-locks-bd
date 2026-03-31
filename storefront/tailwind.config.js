@@ -12,6 +12,15 @@ export default {
         gold: { 400: '#f59e0b', 500: '#d97706', 600: '#b45309' },
       },
       fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+      animation: {
+        'pulse-wa': 'pulse-wa 2s ease-in-out infinite',
+      },
+      keyframes: {
+        'pulse-wa': {
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(37, 211, 102, 0.5)' },
+          '50%': { boxShadow: '0 0 0 10px rgba(37, 211, 102, 0)' },
+        },
+      },
     },
   },
   plugins: [],

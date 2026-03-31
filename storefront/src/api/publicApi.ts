@@ -31,4 +31,10 @@ export const publicApi = {
       return res.data ?? []
     } catch (err) { return handleError(err) }
   },
+
+  sendContact: async (data: { name: string; email: string; phone: string; subject: string; message: string }): Promise<void> => {
+    try {
+      await client.post('/contact', data)
+    } catch (err) { return handleError(err) }
+  },
 }
