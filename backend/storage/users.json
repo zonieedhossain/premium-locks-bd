@@ -1,0 +1,18 @@
+[
+  {
+    "id": "a47fb504-ae28-4178-a1b5-1bf1441c2732",
+    "name": "Super Admin",
+    "email": "admin@admin.com",
+    "password_hash": "$2a$12$11zVnhw47rcSVidbA87CYObwouP/61.detjwb24wq94BljsiTkRt6",
+    "role": "superadmin",
+    "permissions": [
+      "products:read",
+      "products:write",
+      "users:read",
+      "users:write"
+    ],
+    "is_active": true,
+    "created_at": "2026-03-31T04:20:26Z",
+    "created_by": "system"
+  }
+]

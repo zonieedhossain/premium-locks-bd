@@ -1,23 +1,19 @@
 package models
 
-// Product represents a product in the store.
 type Product struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Price       float64 `json:"price"`
-	Category    string  `json:"category"`
-	Stock       int     `json:"stock"`
-	ImageURL    string  `json:"imageUrl"`
-	CreatedAt   string  `json:"createdAt"`
-	UpdatedAt   string  `json:"updatedAt"`
-}
-
-// ProductInput is used for create/update requests parsed from multipart form.
-type ProductInput struct {
-	Name        string  `form:"name"        binding:"required"`
-	Description string  `form:"description" binding:"required"`
-	Price       float64 `form:"price"       binding:"required,gt=0"`
-	Category    string  `form:"category"    binding:"required"`
-	Stock       int     `form:"stock"       binding:"gte=0"`
+	ID               string   `json:"id"`
+	Name             string   `json:"name"`
+	Slug             string   `json:"slug"`
+	SKU              string   `json:"sku"`
+	Category         string   `json:"category"`
+	Price            float64  `json:"price"`
+	DiscountPrice    float64  `json:"discount_price"`
+	ShortDescription string   `json:"short_description"`
+	Description      string   `json:"description"`
+	StockQuantity    int      `json:"stock_quantity"`
+	MainImage        string   `json:"main_image"`
+	GalleryImages    []string `json:"gallery_images"`
+	IsActive         bool     `json:"is_active"`
+	CreatedAt        string   `json:"created_at"`
+	UpdatedAt        string   `json:"updated_at"`
 }
