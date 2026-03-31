@@ -31,3 +31,6 @@ admin/.env
 .DS_Store
 Thumbs.db
 backend/server
+backend/.env
+PROMT.md
+COMPANY.md

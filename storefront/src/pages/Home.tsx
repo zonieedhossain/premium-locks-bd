@@ -5,11 +5,10 @@ import ProductCard from '../components/ProductCard'
 import { publicApi } from '../api/publicApi'
 import type { Product } from '../types/product'
 
-const CATEGORIES = ['Padlock', 'Door Lock', 'Smart Lock', 'Deadbolt', 'Cabinet Lock', 'Chain Lock']
+const CATEGORIES = ['Padlock', 'Door Lock', 'Motorcycle Lock', 'Bicycle Lock']
 
 const catIcons: Record<string, string> = {
-  'Padlock': '🔒', 'Door Lock': '🚪', 'Smart Lock': '📱',
-  'Deadbolt': '🔐', 'Cabinet Lock': '🗄️', 'Chain Lock': '⛓️',
+  'Padlock': '🔒', 'Door Lock': '🚪', 'Motorcycle Lock': '🏍️', 'Bicycle Lock': '🚲',
 }
 
 export default function Home() {
@@ -36,7 +35,7 @@ export default function Home() {
             <h2 className="text-3xl font-extrabold text-gray-900 mb-2">Shop by Category</h2>
             <p className="text-gray-500">Find the perfect lock for every need</p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {CATEGORIES.map((cat) => (
               <Link
                 key={cat}
@@ -57,7 +56,7 @@ export default function Home() {
           <div className="flex items-center justify-between mb-10">
             <div>
               <h2 className="text-3xl font-extrabold text-gray-900">Featured Products</h2>
-              <p className="text-gray-500 mt-1">Our most popular security solutions</p>
+              <p className="text-gray-500 mt-1">Importer & Wholesaler of all types of Lock</p>
             </div>
             <Link to="/products" className="text-brand-600 hover:text-brand-700 font-semibold text-sm flex items-center gap-1">
               View all

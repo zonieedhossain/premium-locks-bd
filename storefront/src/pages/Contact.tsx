@@ -26,10 +26,10 @@ export default function Contact() {
             <h2 className="text-2xl font-extrabold text-gray-900 mb-8">Contact Information</h2>
             <div className="space-y-6">
               {[
-                ['📍', 'Address', '123 Gulshan Avenue, Gulshan-1\nDhaka 1212, Bangladesh'],
-                ['📞', 'Phone', '+880 1700-000000\n+880 1800-000000'],
-                ['✉️', 'Email', 'info@premiumlocksbd.com\nsupport@premiumlocksbd.com'],
-                ['🕐', 'Business Hours', 'Saturday – Thursday: 9 AM – 7 PM\nFriday: Closed'],
+                ['📍', 'Address', 'Shekherchak, Boalia\nRajshahi, Bangladesh'],
+                ['📞', 'Phone', '+880 1737-195614'],
+                ['✉️', 'Email', 'premiumlocksbd@gmail.com'],
+                ['🕐', 'Business Hours', 'Saturday – Thursday: 9 AM – 8 PM\nFriday: Closed'],
               ].map(([icon, label, value]) => (
                 <div key={label} className="flex gap-4">
                   <span className="text-2xl flex-shrink-0">{icon}</span>

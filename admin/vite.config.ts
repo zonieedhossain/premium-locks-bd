@@ -6,8 +6,8 @@ export default defineConfig({
   server: {
     port: 3001,
     proxy: {
-      '/api': { target: 'http://localhost:8080', changeOrigin: true },
-      '/uploads': { target: 'http://localhost:8080', changeOrigin: true },
+      '/api': { target: 'http://172.17.159.131:8081', changeOrigin: true },
+      '/uploads': { target: 'http://172.17.159.131:8081', changeOrigin: true },
     },
   },
 })

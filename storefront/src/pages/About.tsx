@@ -15,9 +15,9 @@ export default function About() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-block bg-gold-400/10 text-gold-600 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full mb-4">Our Mission</div>
-              <h2 className="text-3xl font-extrabold text-gray-900 mb-4">Making Every Home & Business More Secure</h2>
+              <h2 className="text-3xl font-extrabold text-gray-900 mb-4">The Leading Importer & Wholesaler of Locks</h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Premium Locks BD was founded with a simple belief: every person in Bangladesh deserves access to world-class security products at fair prices. What started as a small shop in Gulshan has grown into the country's most trusted security retailer.
+                Premium Locks BD was founded with a simple mission: to provide the highest quality security solutions to homes and businesses across Bangladesh. Operating from our headquarters in Rajshahi, we have grown into one of the country's most trusted importers and wholesalers of all types of locks.
               </p>
               <p className="text-gray-600 leading-relaxed">
                 We source only from certified manufacturers and put every product through rigorous quality checks before it reaches our customers. Our team of security experts is always available to help you choose the right lock for your specific needs.

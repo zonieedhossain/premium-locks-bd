@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "id": "104610ea-d62f-48bf-b676-4aca4a96c77c",
+    "name": "lkj",
+    "slug": "lkj",
+    "sku": "PLB-1456C94A",
+    "category": "Padlock",
+    "price": 100,
+    "discount_price": 1,
+    "short_description": "lkkl;",
+    "description": "kuiokj",
+    "stock_quantity": 50,
+    "main_image": "/uploads/15138510-5f39-47df-bf72-b6f80a51a043.jpg",
+    "gallery_images": [],
+    "is_active": true,
+    "created_at": "2026-03-31T06:21:42Z",
+    "updated_at": "2026-03-31T06:21:42Z"
+  }
+]

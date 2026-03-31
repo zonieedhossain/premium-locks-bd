@@ -16,7 +16,7 @@ export default function Footer() {
               <span className="text-white font-bold text-lg">Premium Locks BD</span>
             </div>
             <p className="text-sm leading-relaxed mb-4">
-              Bangladesh's most trusted source for premium security locks. Protecting homes and businesses since 2015.
+              Importer & Wholesaler of all types of Lock. Serving security needs across Bangladesh with reliability and trust.
             </p>
             {/* Social placeholders */}
             <div className="flex gap-3">
@@ -42,10 +42,10 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold text-sm mb-4">Contact</h4>
             <ul className="space-y-2 text-sm">
-              <li>📍 123 Gulshan Avenue, Dhaka 1212</li>
-              <li>📞 +880 1700-000000</li>
-              <li>✉️ info@premiumlocksbd.com</li>
-              <li>🕐 Sat–Thu, 9 AM – 7 PM</li>
+              <li>📍 Shekherchak, Boalia, Rajshahi</li>
+              <li>📞 +880 1737-195614</li>
+              <li>✉️ premiumlocksbd@gmail.com</li>
+              <li>🕐 Sat–Thu, 9 AM – 8 PM</li>
             </ul>
           </div>
         </div>
