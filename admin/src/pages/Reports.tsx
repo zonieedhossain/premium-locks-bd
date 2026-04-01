@@ -34,7 +34,7 @@ export default function Reports() {
       reportApi.summary(),
       reportApi.sales(from || undefined, to || undefined),
       reportApi.stock(),
-      reportApi.topProducts(),
+      reportApi.topProducts(from || undefined, to || undefined),
       reportApi.monthlyComparison(),
       reportApi.paymentMethods(),
     ]).then(([s, sd, st, tp, mc, pm]) => {
@@ -51,7 +51,24 @@ export default function Reports() {
 
   const handleFilter = (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
     load()
+  }
+
+  const handleDownloadSales = (format: 'excel' | 'pdf' | 'csv') => {
+    window.open(reportApi.downloadSalesUrl(from || undefined, to || undefined, format), '_blank')
+  }
+
+  const handleDownloadPurchases = (format: 'excel' | 'pdf' | 'csv') => {
+    window.open(reportApi.downloadPurchasesUrl(from || undefined, to || undefined, format), '_blank')
+  }
+
+  const handleDownloadStock = (format: 'excel' | 'pdf') => {
+    window.open(reportApi.downloadStockUrl(format), '_blank')
+  }
+
+  const handleDownloadTopProducts = (format: 'excel' | 'pdf') => {
+    window.open(reportApi.downloadTopProductsUrl(from || undefined, to || undefined, format), '_blank')
   }
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" /></div>
@@ -91,8 +108,18 @@ export default function Reports() {
       {/* Sales Trend */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-bold text-gray-900">Sales Trend</h2>
-          <button onClick={() => window.print()} className="text-xs font-medium text-gray-500 hover:text-gray-700 px-3 py-1.5 border border-gray-200 rounded-lg">Print</button>
+          <div>
+            <h2 className="font-bold text-gray-900 line-height-1">Sales Trend</h2>
+            <p className="text-xs text-gray-400 mt-1">Detailed revenue visualization</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <div className="flex border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+              <button onClick={() => handleDownloadSales('excel')} className="text-[10px] font-bold text-gray-700 bg-white hover:bg-gray-50 px-3 py-2 border-r border-gray-100 transition-colors">EXCEL</button>
+              <button onClick={() => handleDownloadSales('pdf')} className="text-[10px] font-bold text-gray-700 bg-white hover:bg-gray-50 px-3 py-2 border-r border-gray-100 transition-colors">PDF</button>
+              <button onClick={() => handleDownloadSales('csv')} className="text-[10px] font-bold text-gray-700 bg-white hover:bg-gray-50 px-3 py-2 transition-colors">CSV</button>
+            </div>
+            <button onClick={() => window.print()} className="text-xs font-semibold text-gray-500 hover:text-gray-700 px-3 py-2 border border-gray-200 rounded-xl transition-colors">Print View</button>
+          </div>
         </div>
         {salesData.length === 0 ? (
           <p className="text-gray-400 text-sm text-center py-8">No sales data in range</p>
@@ -113,7 +140,13 @@ export default function Reports() {
       {/* Top Products + Payment Methods */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 className="font-bold text-gray-900 mb-6">Top 10 Products (by Units Sold)</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="font-bold text-gray-900">Top 10 Products (by Units Sold)</h2>
+            <div className="flex border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+              <button onClick={() => handleDownloadTopProducts('excel')} className="text-[10px] font-bold text-gray-700 bg-white hover:bg-gray-50 px-3 py-2 border-r border-gray-100 transition-colors">EXCEL</button>
+              <button onClick={() => handleDownloadTopProducts('pdf')} className="text-[10px] font-bold text-gray-700 bg-white hover:bg-gray-50 px-3 py-2 transition-colors">PDF</button>
+            </div>
+          </div>
           {topProducts.length === 0 ? (
             <p className="text-gray-400 text-sm text-center py-8">No data</p>
           ) : (
@@ -148,7 +181,17 @@ export default function Reports() {
 
       {/* Monthly Comparison */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h2 className="font-bold text-gray-900 mb-6">Monthly Purchase vs Sales</h2>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="font-bold text-gray-900">Monthly Purchase vs Sales</h2>
+            <p className="text-xs text-gray-400 mt-1">Comparison of sourcing costs vs revenue</p>
+          </div>
+          <div className="flex border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+            <button onClick={() => handleDownloadPurchases('excel')} className="text-[10px] font-bold text-gray-700 bg-white hover:bg-gray-50 px-3 py-2 border-r border-gray-100 transition-colors">EXCEL</button>
+            <button onClick={() => handleDownloadPurchases('pdf')} className="text-[10px] font-bold text-gray-700 bg-white hover:bg-gray-50 px-3 py-2 border-r border-gray-100 transition-colors">PDF</button>
+            <button onClick={() => handleDownloadPurchases('csv')} className="text-[10px] font-bold text-gray-700 bg-white hover:bg-gray-50 px-3 py-2 transition-colors">CSV</button>
+          </div>
+        </div>
         {monthly.length === 0 ? (
           <p className="text-gray-400 text-sm text-center py-8">No data</p>
         ) : (
@@ -170,6 +213,10 @@ export default function Reports() {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-bold text-gray-900">Stock Levels</h2>
+          <div className="flex border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+            <button onClick={() => handleDownloadStock('excel')} className="text-[10px] font-bold text-gray-700 bg-white hover:bg-gray-50 px-3 py-2 border-r border-gray-100 transition-colors">STOCK EXCEL</button>
+            <button onClick={() => handleDownloadStock('pdf')} className="text-[10px] font-bold text-gray-700 bg-white hover:bg-gray-50 px-3 py-2 transition-colors">STOCK PDF</button>
+          </div>
         </div>
         {stockData.length === 0 ? (
           <p className="text-gray-400 text-sm text-center py-8">No products</p>

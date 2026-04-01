@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { productApi } from '../api/productApi'
 import ProductForm from '../components/ProductForm'
+import Pagination from '../components/Pagination'
 import type { Product, ProductFormData } from '../types/product'
 
 const PLACEHOLDER = 'https://placehold.co/48x48/1a3dd6/ffffff?text=P'
@@ -12,16 +13,22 @@ export default function AdminProducts() {
   const [modal, setModal] = useState<{ type: 'create' | 'edit'; product?: Product } | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const limit = 10
 
-  const load = () => {
+  const load = (p = page) => {
     setLoading(true)
-    productApi.getAll()
-      .then(setProducts)
+    productApi.getAll(p, limit)
+      .then(res => {
+        setProducts(res.data)
+        setTotal(res.total)
+      })
       .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Failed'))
       .finally(() => setLoading(false))
   }
 
-  useEffect(load, [])
+  useEffect(() => { load(page) }, [page])
 
   const handleSubmit = async (data: ProductFormData) => {
     if (modal?.type === 'edit' && modal.product) await productApi.update(modal.product.id, data)
@@ -42,12 +49,14 @@ export default function AdminProducts() {
     load()
   }
 
+  const totalPages = Math.ceil(total / limit)
+
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-          <p className="text-gray-500 text-sm mt-0.5">{products.length} products in catalogue</p>
+          <p className="text-gray-500 text-sm mt-0.5">{total} products in catalogue</p>
         </div>
         <button onClick={() => setModal({ type: 'create' })}
           className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-colors">
@@ -114,6 +123,9 @@ export default function AdminProducts() {
                 ))}
               </tbody>
             </table>
+            <div className="border-t border-gray-100">
+              <Pagination page={page} totalPages={totalPages} total={total} onPageChange={setPage} />
+            </div>
           </div>
         </div>
       )}

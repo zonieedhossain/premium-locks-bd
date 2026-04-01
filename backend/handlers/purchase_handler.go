@@ -5,7 +5,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"premium-locks-bd/models"
 	"premium-locks-bd/services"
+	"premium-locks-bd/utils"
 )
 
 type PurchaseHandler struct {
@@ -18,12 +20,37 @@ func NewPurchaseHandler(svc *services.PurchaseService) *PurchaseHandler {
 
 // GET /api/admin/purchases
 func (h *PurchaseHandler) GetAll(c *gin.Context) {
+	from := c.Query("from")
+	to := c.Query("to")
+
 	items, err := h.svc.GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, items)
+
+	if from != "" || to != "" {
+		filtered := make([]models.Purchase, 0)
+		for _, p := range items {
+			date := p.CreatedAt
+			if len(date) >= 10 {
+				date = date[:10]
+			}
+			if from != "" && date < from {
+				continue
+			}
+			if to != "" && date > to {
+				continue
+			}
+			filtered = append(filtered, p)
+		}
+		items = filtered
+	}
+	page, limit := utils.ParsePagination(c)
+	data, total := utils.Paginate(items, page, limit)
+	c.JSON(http.StatusOK, models.PaginatedResponse[models.Purchase]{
+		Data: data, Total: total, Page: page, Limit: limit,
+	})
 }
 
 // GET /api/admin/purchases/:id
@@ -43,10 +70,12 @@ type purchaseItemBody struct {
 }
 
 type purchaseBody struct {
-	SupplierName string             `json:"supplier_name" binding:"required"`
-	Items        []purchaseItemBody `json:"items" binding:"required,min=1"`
-	PaidAmount   float64            `json:"paid_amount"`
-	Note         string             `json:"note"`
+	SupplierName  string             `json:"supplier_name" binding:"required"`
+	Items         []purchaseItemBody `json:"items" binding:"required,min=1"`
+	PaidAmount    float64            `json:"paid_amount"`
+	PaymentMethod string             `json:"payment_method"`
+	TransactionID string             `json:"transaction_id"`
+	Note          string             `json:"note"`
 }
 
 // POST /api/admin/purchases
@@ -59,10 +88,12 @@ func (h *PurchaseHandler) Create(c *gin.Context) {
 
 	claims := getClaimsFromCtx(c)
 	input := services.PurchaseInput{
-		SupplierName: body.SupplierName,
-		PaidAmount:   body.PaidAmount,
-		Note:         body.Note,
-		CreatedBy:    claims.UserID,
+		SupplierName:  body.SupplierName,
+		PaidAmount:    body.PaidAmount,
+		PaymentMethod: body.PaymentMethod,
+		TransactionID: body.TransactionID,
+		Note:          body.Note,
+		CreatedBy:     claims.UserID,
 	}
 	for _, it := range body.Items {
 		input.Items = append(input.Items, services.PurchaseItemInput{

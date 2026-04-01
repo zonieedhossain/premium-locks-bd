@@ -4,6 +4,7 @@ export interface SaleItem {
   sku: string
   quantity: number
   unit_price: number
+  cost_price: number
   discount: number
   subtotal: number
 }
@@ -22,6 +23,7 @@ export interface Sale {
   total_amount: number
   paid_amount: number
   payment_method: string
+  transaction_id: string
   status: 'pending' | 'completed' | 'cancelled' | 'refunded'
   note: string
   created_by: string
@@ -38,5 +40,6 @@ export interface CreateSaleInput {
   discount_amount: number
   paid_amount: number
   payment_method: string
+  transaction_id: string
   note: string
 }

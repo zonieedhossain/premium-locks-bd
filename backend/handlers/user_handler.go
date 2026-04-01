@@ -6,7 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"premium-locks-bd/middleware"
+	"premium-locks-bd/models"
 	"premium-locks-bd/services"
+	"premium-locks-bd/utils"
 )
 
 // UserHandler handles user management routes.
@@ -26,7 +28,11 @@ func (h *UserHandler) GetAll(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, users)
+	page, limit := utils.ParsePagination(c)
+	data, total := utils.Paginate(users, page, limit)
+	c.JSON(http.StatusOK, models.PaginatedResponse[models.SafeUser]{
+		Data: data, Total: total, Page: page, Limit: limit,
+	})
 }
 
 // GetByID — GET /api/admin/users/:id

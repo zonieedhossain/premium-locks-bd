@@ -13,20 +13,21 @@ type PurchaseRepository interface {
 	Save(p models.Purchase) error
 	Update(p models.Purchase) error
 	Delete(id string) error
+	GetByDateRange(from, to string) ([]models.Purchase, error)
 }
 
 type jsonPurchaseRepo struct {
-	store *storage.JSONStore[models.Purchase]
+	store *storage.PartitionedJSONStore[models.Purchase]
 }
 
 func NewPurchaseRepository(storageDir string) PurchaseRepository {
 	return &jsonPurchaseRepo{
-		store: storage.NewJSONStore[models.Purchase](storageDir + "/purchases.json"),
+		store: storage.NewPartitionedJSONStore[models.Purchase](storageDir + "/purchases"),
 	}
 }
 
 func (r *jsonPurchaseRepo) GetAll() ([]models.Purchase, error) {
-	items, err := r.store.Read()
+	items, err := r.store.ReadAll()
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +38,7 @@ func (r *jsonPurchaseRepo) GetAll() ([]models.Purchase, error) {
 }
 
 func (r *jsonPurchaseRepo) GetByID(id string) (*models.Purchase, error) {
-	items, err := r.store.Read()
+	items, err := r.store.ReadAll()
 	if err != nil {
 		return nil, err
 	}
@@ -50,38 +51,98 @@ func (r *jsonPurchaseRepo) GetByID(id string) (*models.Purchase, error) {
 }
 
 func (r *jsonPurchaseRepo) Save(p models.Purchase) error {
-	items, err := r.store.Read()
+	date := "unknown"
+	if len(p.CreatedAt) >= 10 {
+		date = p.CreatedAt[:10]
+	}
+	items, err := r.store.Read(date)
 	if err != nil {
 		return err
 	}
 	items = append(items, p)
-	return r.store.Write(items)
+	return r.store.Write(date, items)
 }
 
 func (r *jsonPurchaseRepo) Update(p models.Purchase) error {
-	items, err := r.store.Read()
+	date := "unknown"
+	if len(p.CreatedAt) >= 10 {
+		date = p.CreatedAt[:10]
+	}
+
+	items, err := r.store.Read(date)
 	if err != nil {
 		return err
 	}
+
+	found := false
 	for i := range items {
 		if items[i].ID == p.ID {
 			items[i] = p
-			return r.store.Write(items)
+			found = true
+			break
 		}
 	}
-	return fmt.Errorf("purchase not found: %s", p.ID)
+
+	if !found {
+		all, _ := r.store.ReadAll()
+		for _, item := range all {
+			if item.ID == p.ID {
+				origDate := item.CreatedAt[:10]
+				origItems, _ := r.store.Read(origDate)
+				for j := range origItems {
+					if origItems[j].ID == p.ID {
+						origItems[j] = p
+						return r.store.Write(origDate, origItems)
+					}
+				}
+			}
+		}
+		return fmt.Errorf("purchase not found: %s", p.ID)
+	}
+
+	return r.store.Write(date, items)
 }
 
 func (r *jsonPurchaseRepo) Delete(id string) error {
-	items, err := r.store.Read()
+	all, err := r.store.ReadAll()
 	if err != nil {
 		return err
 	}
+
+	foundDate := ""
+	for _, p := range all {
+		if p.ID == id {
+			foundDate = p.CreatedAt[:10]
+			break
+		}
+	}
+
+	if foundDate == "" {
+		return fmt.Errorf("purchase not found: %s", id)
+	}
+
+	items, err := r.store.Read(foundDate)
+	if err != nil {
+		return err
+	}
+
 	for i, p := range items {
 		if p.ID == id {
 			items = append(items[:i], items[i+1:]...)
-			return r.store.Write(items)
+			return r.store.Write(foundDate, items)
 		}
 	}
-	return fmt.Errorf("purchase not found: %s", id)
+
+	return fmt.Errorf("purchase not found in partitioned file: %s", id)
+}
+
+func (r *jsonPurchaseRepo) GetByDateRange(from, to string) ([]models.Purchase, error) {
+	items, err := r.store.ReadByRange(from, to)
+	if err != nil {
+		return nil, err
+	}
+	if items == nil {
+		return []models.Purchase{}, nil
+	}
+	return items, nil
 }

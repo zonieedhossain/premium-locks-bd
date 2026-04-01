@@ -13,6 +13,8 @@ export interface Purchase {
   items: PurchaseItem[]
   total_amount: number
   paid_amount: number
+  payment_method: string
+  transaction_id: string
   status: 'pending' | 'received' | 'cancelled'
   note: string
   created_by: string
@@ -24,5 +26,7 @@ export interface CreatePurchaseInput {
   supplier_name: string
   items: { product_id: string; quantity: number; unit_cost: number }[]
   paid_amount: number
+  payment_method: string
+  transaction_id: string
   note: string
 }

@@ -1,0 +1,31 @@
+[
+  {
+    "id": "pur-2-uuid-9999-9999-9999-999999999999",
+    "supplier_name": "Smart Home Global",
+    "items": [
+      {
+        "product_id": "7e7f7a7b-7c7d-4e4f-8a8b-8c8d8e8f8a8b",
+        "product_name": "Smart Fingerprint Door Lock",
+        "sku": "PL-DOR-002",
+        "quantity": 20,
+        "unit_cost": 4500,
+        "subtotal": 90000
+      },
+      {
+        "product_id": "5e5f5a5b-5c5d-4e4f-6a6b-6c6d6e6f5a5b",
+        "product_name": "High-Security U-Lock for Bicycle",
+        "sku": "PL-BIK-004",
+        "quantity": 40,
+        "unit_cost": 900,
+        "subtotal": 36000
+      }
+    ],
+    "total_amount": 126000,
+    "paid_amount": 126000,
+    "status": "received",
+    "note": "Stock up for door and bike locks.",
+    "created_by": "a47fb504-ae28-4178-a1b5-1bf1441c2732",
+    "created_at": "2026-03-28T11:00:00Z",
+    "updated_at": "2026-03-28T11:00:00Z"
+  }
+]

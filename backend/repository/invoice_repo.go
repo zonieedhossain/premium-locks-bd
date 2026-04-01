@@ -12,20 +12,21 @@ type InvoiceRepository interface {
 	GetByID(id string) (*models.Invoice, error)
 	Save(inv models.Invoice) error
 	Update(inv models.Invoice) error
+	GetByDateRange(from, to string) ([]models.Invoice, error)
 }
 
 type jsonInvoiceRepo struct {
-	store *storage.JSONStore[models.Invoice]
+	store *storage.PartitionedJSONStore[models.Invoice]
 }
 
 func NewInvoiceRepository(storageDir string) InvoiceRepository {
 	return &jsonInvoiceRepo{
-		store: storage.NewJSONStore[models.Invoice](storageDir + "/invoices.json"),
+		store: storage.NewPartitionedJSONStore[models.Invoice](storageDir + "/invoices"),
 	}
 }
 
 func (r *jsonInvoiceRepo) GetAll() ([]models.Invoice, error) {
-	items, err := r.store.Read()
+	items, err := r.store.ReadAll()
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +37,7 @@ func (r *jsonInvoiceRepo) GetAll() ([]models.Invoice, error) {
 }
 
 func (r *jsonInvoiceRepo) GetByID(id string) (*models.Invoice, error) {
-	items, err := r.store.Read()
+	items, err := r.store.ReadAll()
 	if err != nil {
 		return nil, err
 	}
@@ -49,24 +50,65 @@ func (r *jsonInvoiceRepo) GetByID(id string) (*models.Invoice, error) {
 }
 
 func (r *jsonInvoiceRepo) Save(inv models.Invoice) error {
-	items, err := r.store.Read()
+	date := "unknown"
+	if len(inv.CreatedAt) >= 10 {
+		date = inv.CreatedAt[:10]
+	}
+	items, err := r.store.Read(date)
 	if err != nil {
 		return err
 	}
 	items = append(items, inv)
-	return r.store.Write(items)
+	return r.store.Write(date, items)
 }
 
 func (r *jsonInvoiceRepo) Update(inv models.Invoice) error {
-	items, err := r.store.Read()
+	date := "unknown"
+	if len(inv.CreatedAt) >= 10 {
+		date = inv.CreatedAt[:10]
+	}
+
+	items, err := r.store.Read(date)
 	if err != nil {
 		return err
 	}
+
+	found := false
 	for i := range items {
 		if items[i].ID == inv.ID {
 			items[i] = inv
-			return r.store.Write(items)
+			found = true
+			break
 		}
 	}
-	return fmt.Errorf("invoice not found: %s", inv.ID)
+
+	if !found {
+		all, _ := r.store.ReadAll()
+		for _, item := range all {
+			if item.ID == inv.ID {
+				origDate := item.CreatedAt[:10]
+				origItems, _ := r.store.Read(origDate)
+				for j := range origItems {
+					if origItems[j].ID == inv.ID {
+						origItems[j] = inv
+						return r.store.Write(origDate, origItems)
+					}
+				}
+			}
+		}
+		return fmt.Errorf("invoice not found: %s", inv.ID)
+	}
+
+	return r.store.Write(date, items)
+}
+
+func (r *jsonInvoiceRepo) GetByDateRange(from, to string) ([]models.Invoice, error) {
+	items, err := r.store.ReadByRange(from, to)
+	if err != nil {
+		return nil, err
+	}
+	if items == nil {
+		return []models.Invoice{}, nil
+	}
+	return items, nil
 }

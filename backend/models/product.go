@@ -11,6 +11,7 @@ type Product struct {
 	ShortDescription string   `json:"short_description"`
 	Description      string   `json:"description"`
 	StockQuantity    int      `json:"stock_quantity"`
+	CostPrice        float64  `json:"cost_price"`
 	MainImage        string   `json:"main_image"`
 	GalleryImages    []string `json:"gallery_images"`
 	IsActive         bool     `json:"is_active"`

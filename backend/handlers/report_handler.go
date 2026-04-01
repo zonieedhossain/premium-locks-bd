@@ -4,7 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"premium-locks-bd/models"
 	"premium-locks-bd/services"
+	"premium-locks-bd/utils"
 )
 
 type ReportHandler struct {
@@ -55,9 +57,9 @@ func (h *ReportHandler) Stock(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
-// GET /api/admin/reports/top-products
+// GET /api/admin/reports/top-products?from=&to=
 func (h *ReportHandler) TopProducts(c *gin.Context) {
-	data, err := h.svc.TopProducts()
+	data, err := h.svc.TopProducts(c.Query("from"), c.Query("to"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -85,6 +87,20 @@ func (h *ReportHandler) PaymentMethods(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
+// GET /api/admin/reports/profit?from=&to=&page=1&limit=10
+func (h *ReportHandler) ProfitList(c *gin.Context) {
+	data, err := h.svc.ProfitList(c.Query("from"), c.Query("to"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	page, limit := utils.ParsePagination(c)
+	paginatedData, total := utils.Paginate(data, page, limit)
+	c.JSON(http.StatusOK, models.PaginatedResponse[services.ProfitRecord]{
+		Data: paginatedData, Total: total, Page: page, Limit: limit,
+	})
+}
+
 // GET /api/admin/reports/export/sales
 func (h *ReportHandler) ExportSales(c *gin.Context) {
 	data, err := h.svc.SalesReport(c.Query("from"), c.Query("to"))
@@ -103,4 +119,145 @@ func (h *ReportHandler) ExportStock(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, data)
+}
+
+// GET /api/admin/reports/download/sales?from=&to=&format=csv
+func (h *ReportHandler) DownloadSales(c *gin.Context) {
+	from := c.Query("from")
+	to := c.Query("to")
+	format := c.DefaultQuery("format", "csv")
+
+	var data []byte
+	var err error
+	var filename string
+	var contentType string
+
+	switch format {
+	case "excel":
+		data, err = h.svc.GenerateSalesExcel(from, to)
+		contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+		filename = "sales_report.xlsx"
+	case "pdf":
+		data, err = h.svc.GenerateSalesPDF(from, to)
+		contentType = "application/pdf"
+		filename = "sales_report.pdf"
+	default:
+		data, err = h.svc.GenerateSalesCSV(from, to)
+		contentType = "text/csv"
+		filename = "sales_report.csv"
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Header("Content-Disposition", "attachment; filename="+filename)
+	c.Data(http.StatusOK, contentType, data)
+}
+
+// GET /api/admin/reports/download/purchases?from=&to=&format=csv
+func (h *ReportHandler) DownloadPurchases(c *gin.Context) {
+	from := c.Query("from")
+	to := c.Query("to")
+	format := c.DefaultQuery("format", "csv")
+
+	var data []byte
+	var err error
+	var filename string
+	var contentType string
+
+	switch format {
+	case "excel":
+		data, err = h.svc.GeneratePurchasesExcel(from, to)
+		contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+		filename = "purchases_report.xlsx"
+	case "pdf":
+		data, err = h.svc.GeneratePurchasesPDF(from, to)
+		contentType = "application/pdf"
+		filename = "purchases_report.pdf"
+	default:
+		data, err = h.svc.GeneratePurchasesCSV(from, to)
+		contentType = "text/csv"
+		filename = "purchases_report.csv"
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Header("Content-Disposition", "attachment; filename="+filename)
+	c.Data(http.StatusOK, contentType, data)
+}
+
+// GET /api/admin/reports/download/profit?from=&to=
+func (h *ReportHandler) DownloadProfit(c *gin.Context) {
+	from := c.Query("from")
+	to := c.Query("to")
+
+	data, err := h.svc.GenerateProfitPDF(from, to)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Header("Content-Disposition", "attachment; filename=profit_report.pdf")
+	c.Data(http.StatusOK, "application/pdf", data)
+}
+
+// GET /api/admin/reports/download/stock?format=excel
+func (h *ReportHandler) DownloadStock(c *gin.Context) {
+	format := c.DefaultQuery("format", "excel")
+	var data []byte
+	var err error
+	var filename string
+	var contentType string
+
+	if format == "pdf" {
+		data, err = h.svc.GenerateStockPDF()
+		contentType = "application/pdf"
+		filename = "stock_report.pdf"
+	} else {
+		data, err = h.svc.GenerateStockExcel()
+		contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+		filename = "stock_report.xlsx"
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Header("Content-Disposition", "attachment; filename="+filename)
+	c.Data(http.StatusOK, contentType, data)
+}
+
+// GET /api/admin/reports/download/top-products?from=&to=&format=excel
+func (h *ReportHandler) DownloadTopProducts(c *gin.Context) {
+	from := c.Query("from")
+	to := c.Query("to")
+	format := c.DefaultQuery("format", "excel")
+	var data []byte
+	var err error
+	var filename string
+	var contentType string
+
+	if format == "pdf" {
+		data, err = h.svc.GenerateTopProductsPDF(from, to)
+		contentType = "application/pdf"
+		filename = "top_products.pdf"
+	} else {
+		data, err = h.svc.GenerateTopProductsExcel(from, to)
+		contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+		filename = "top_products.xlsx"
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Header("Content-Disposition", "attachment; filename="+filename)
+	c.Data(http.StatusOK, contentType, data)
 }

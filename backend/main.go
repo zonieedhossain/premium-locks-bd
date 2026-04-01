@@ -138,6 +138,7 @@ func main() {
 		adminSales.POST("", middleware.RequirePermission("products:write"), saleHandler.Create)
 		adminSales.PUT("/:id", middleware.RequirePermission("products:write"), saleHandler.Update)
 		adminSales.PATCH("/:id/cancel", middleware.RequirePermission("products:write"), saleHandler.Cancel)
+		adminSales.PATCH("/:id/complete", middleware.RequirePermission("products:write"), saleHandler.Complete)
 		adminSales.DELETE("/:id", middleware.RequirePermission("products:write"), saleHandler.Delete)
 	}
 
@@ -161,8 +162,13 @@ func main() {
 		adminReports.GET("/top-products", middleware.RequirePermission("products:read"), reportHandler.TopProducts)
 		adminReports.GET("/monthly-comparison", middleware.RequirePermission("products:read"), reportHandler.MonthlyComparison)
 		adminReports.GET("/payment-methods", middleware.RequirePermission("products:read"), reportHandler.PaymentMethods)
-		adminReports.GET("/export/sales", middleware.RequirePermission("products:read"), reportHandler.ExportSales)
+		adminReports.GET("/profit", middleware.RequirePermission("products:read"), reportHandler.ProfitList)
 		adminReports.GET("/export/stock", middleware.RequirePermission("products:read"), reportHandler.ExportStock)
+		adminReports.GET("/download/sales", middleware.RequirePermission("products:read"), reportHandler.DownloadSales)
+		adminReports.GET("/download/purchases", middleware.RequirePermission("products:read"), reportHandler.DownloadPurchases)
+		adminReports.GET("/download/profit", middleware.RequirePermission("products:read"), reportHandler.DownloadProfit)
+		adminReports.GET("/download/stock", middleware.RequirePermission("products:read"), reportHandler.DownloadStock)
+		adminReports.GET("/download/top-products", middleware.RequirePermission("products:read"), reportHandler.DownloadTopProducts)
 	}
 
 	slog.Info("backend starting", "port", cfg.Port)

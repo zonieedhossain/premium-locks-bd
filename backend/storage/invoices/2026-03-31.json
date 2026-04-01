@@ -1,0 +1,26 @@
+[
+  {
+    "id": "inv-1-uuid",
+    "invoice_number": "INV-SALE-0001",
+    "type": "sale",
+    "linked_id": "sale-s1-uuid-1111-1111-111111111111",
+    "file_path": "invoices/sale_sale-s1-_20260331172351.pdf",
+    "created_at": "2026-03-31T12:23:51Z"
+  },
+  {
+    "id": "inv-2-uuid",
+    "invoice_number": "INV-SALE-0002",
+    "type": "sale",
+    "linked_id": "sale-s2-uuid-2222-2222-222222222222",
+    "file_path": "invoices/sale_sale-s2-_20260401072834.pdf",
+    "created_at": "2026-04-01T02:28:34Z"
+  },
+  {
+    "id": "inv-3-uuid",
+    "invoice_number": "INV-PUR-0003",
+    "type": "purchase",
+    "linked_id": "pur-1-uuid-8888-8888-8888-888888888888",
+    "file_path": "invoices/purchase_pur-1-uu_20260401072957.pdf",
+    "created_at": "2026-04-01T02:29:57Z"
+  }
+]

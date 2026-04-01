@@ -13,9 +13,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     Promise.all([
-      productApi.getAll().catch(() => [] as Product[]),
-      userApi.getAll().catch(() => [] as User[]),
-    ]).then(([p, u]) => { setProducts(p); setUsers(u) }).finally(() => setLoading(false))
+      productApi.getAll(1, 1000).catch(() => ({ data: [] as Product[], total: 0, page: 1, limit: 10 })),
+      userApi.getAll(1, 1000).catch(() => ({ data: [] as User[], total: 0, page: 1, limit: 10 })),
+    ]).then(([p, u]) => { setProducts(p.data); setUsers(u.data) }).finally(() => setLoading(false))
   }, [])
 
   const stats = [

@@ -1,16 +1,28 @@
 import { useEffect, useState } from 'react'
 import { invoiceApi } from '../api/invoiceApi'
+import Pagination from '../components/Pagination'
 import type { Invoice } from '../types/invoice'
 
 export default function Invoices() {
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
 
-  const load = () => {
-    invoiceApi.getAll().then(setInvoices).finally(() => setLoading(false))
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const limit = 10
+
+  const load = (p = page) => {
+    setLoading(true)
+    invoiceApi.getAll(p, limit).then(res => {
+      setInvoices(res.data)
+      setTotal(res.total)
+    }).finally(() => setLoading(false))
   }
 
-  useEffect(load, [])
+  useEffect(() => { load(page) }, [page])
+
+  const totalPages = Math.ceil(total / limit)
+
 
   return (
     <div>
@@ -65,6 +77,7 @@ export default function Invoices() {
             </table>
           </div>
         )}
+        <Pagination page={page} totalPages={totalPages} total={total} onPageChange={setPage} />
       </div>
     </div>
   )

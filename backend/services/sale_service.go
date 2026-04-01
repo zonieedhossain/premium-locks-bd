@@ -46,6 +46,7 @@ type SaleInput struct {
 	DiscountAmount  float64
 	PaidAmount      float64
 	PaymentMethod   string
+	TransactionID   string
 	Note            string
 	CreatedBy       string
 }
@@ -103,6 +104,7 @@ func (s *SaleService) Create(input SaleInput) (*models.Sale, error) {
 			SKU:         p.SKU,
 			Quantity:    item.Quantity,
 			UnitPrice:   item.UnitPrice,
+			CostPrice:   p.CostPrice,
 			Discount:    item.Discount,
 			Subtotal:    subtotal,
 		})
@@ -140,6 +142,7 @@ func (s *SaleService) Create(input SaleInput) (*models.Sale, error) {
 		TotalAmount:     total,
 		PaidAmount:      input.PaidAmount,
 		PaymentMethod:   input.PaymentMethod,
+		TransactionID:   input.TransactionID,
 		Status:          "pending",
 		Note:            input.Note,
 		CreatedBy:       input.CreatedBy,
@@ -215,6 +218,26 @@ func (s *SaleService) Cancel(id string) (*models.Sale, error) {
 	}
 
 	sale.Status = "cancelled"
+	sale.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+	if err := s.saleRepo.Update(*sale); err != nil {
+		return nil, err
+	}
+	return sale, nil
+}
+
+func (s *SaleService) Complete(id string) (*models.Sale, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	sale, err := s.saleRepo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+	if sale.Status != "pending" {
+		return nil, fmt.Errorf("only pending sales can be marked as complete")
+	}
+
+	sale.Status = "completed"
 	sale.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
 	if err := s.saleRepo.Update(*sale); err != nil {
 		return nil, err

@@ -5,7 +5,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"premium-locks-bd/models"
 	"premium-locks-bd/services"
+	"premium-locks-bd/utils"
 )
 
 type SaleHandler struct {
@@ -16,14 +18,43 @@ func NewSaleHandler(svc *services.SaleService) *SaleHandler {
 	return &SaleHandler{svc: svc}
 }
 
-// GET /api/admin/sales
+// GET /api/admin/sales?page=1&limit=10
 func (h *SaleHandler) GetAll(c *gin.Context) {
+	from := c.Query("from")
+	to := c.Query("to")
+
+	var items []models.Sale
+	var err error
+
 	items, err := h.svc.GetAll()
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, items)
+
+	if from != "" || to != "" {
+		filtered := make([]models.Sale, 0)
+		for _, sale := range items {
+			date := sale.CreatedAt
+			if len(date) >= 10 {
+				date = date[:10]
+			}
+			if from != "" && date < from {
+				continue
+			}
+			if to != "" && date > to {
+				continue
+			}
+			filtered = append(filtered, sale)
+		}
+		items = filtered
+	}
+	page, limit := utils.ParsePagination(c)
+	data, total := utils.Paginate(items, page, limit)
+	c.JSON(http.StatusOK, models.PaginatedResponse[models.Sale]{
+		Data: data, Total: total, Page: page, Limit: limit,
+	})
 }
 
 // GET /api/admin/sales/:id
@@ -52,6 +83,7 @@ type saleBody struct {
 	DiscountAmount  float64        `json:"discount_amount"`
 	PaidAmount      float64        `json:"paid_amount"`
 	PaymentMethod   string         `json:"payment_method"`
+	TransactionID   string         `json:"transaction_id"`
 	Note            string         `json:"note"`
 }
 
@@ -72,6 +104,7 @@ func (h *SaleHandler) Create(c *gin.Context) {
 		DiscountAmount:  body.DiscountAmount,
 		PaidAmount:      body.PaidAmount,
 		PaymentMethod:   body.PaymentMethod,
+		TransactionID:   body.TransactionID,
 		Note:            body.Note,
 		CreatedBy:       claims.UserID,
 	}
@@ -132,6 +165,20 @@ func (h *SaleHandler) Update(c *gin.Context) {
 // PATCH /api/admin/sales/:id/cancel
 func (h *SaleHandler) Cancel(c *gin.Context) {
 	s, err := h.svc.Cancel(c.Param("id"))
+	if err != nil {
+		status := http.StatusBadRequest
+		if strings.Contains(err.Error(), "not found") {
+			status = http.StatusNotFound
+		}
+		c.JSON(status, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, s)
+}
+
+// PATCH /api/admin/sales/:id/complete
+func (h *SaleHandler) Complete(c *gin.Context) {
+	s, err := h.svc.Complete(c.Param("id"))
 	if err != nil {
 		status := http.StatusBadRequest
 		if strings.Contains(err.Error(), "not found") {

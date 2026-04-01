@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { userApi } from '../api/userApi'
 import UserForm from '../components/UserForm'
+import Pagination from '../components/Pagination'
 import { useAuth } from '../context/AuthContext'
 import type { User, UserFormData } from '../types/user'
 
@@ -16,12 +17,21 @@ export default function AdminUsers() {
   const [modal, setModal] = useState<{ type: 'create' | 'edit'; user?: User } | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null)
 
-  const load = () => {
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const limit = 10
+
+  const load = (p = page) => {
     setLoading(true)
-    userApi.getAll().then(setUsers).catch(console.error).finally(() => setLoading(false))
+    userApi.getAll(p, limit).then(res => {
+      setUsers(res.data)
+      setTotal(res.total)
+    }).catch(console.error).finally(() => setLoading(false))
   }
 
-  useEffect(load, [])
+  useEffect(() => { load(page) }, [page])
+
+  const totalPages = Math.ceil(total / limit)
 
   const handleSubmit = async (data: UserFormData) => {
     if (modal?.type === 'edit' && modal.user) await userApi.update(modal.user.id, data)
@@ -102,6 +112,7 @@ export default function AdminUsers() {
               ))}
             </tbody>
           </table>
+          <Pagination page={page} totalPages={totalPages} total={total} onPageChange={setPage} />
         </div>
       )}
 

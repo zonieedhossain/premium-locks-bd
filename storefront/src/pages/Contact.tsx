@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { publicApi } from '../api/publicApi'
+import mapImg from '../assets/map.png'
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' })
@@ -51,14 +52,22 @@ export default function Contact() {
               ))}
             </div>
 
-            {/* Map placeholder */}
-            <div className="mt-8 bg-gray-100 rounded-2xl h-48 flex items-center justify-center border border-gray-200">
-              <div className="text-center text-gray-400">
-                <svg className="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                </svg>
-                <p className="text-sm font-medium">Shekherchak, Boalia, Rajshahi</p>
+            {/* Map Integration */}
+            <div className="mt-8 rounded-2xl overflow-hidden border border-gray-200 shadow-sm relative group">
+              <img 
+                src={mapImg} 
+                alt="Premium Locks BD Location Map" 
+                className="w-full h-64 object-cover transition-all duration-700"
+              />
+              <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors flex items-center justify-center">
+                <a 
+                  href="https://www.google.com/maps/dir/?api=1&destination=Shekherchak,Boalia,Rajshahi,Bangladesh" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="bg-white/90 backdrop-blur-sm text-gray-900 px-5 py-2.5 rounded-full text-xs font-bold shadow-xl opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:bg-brand-600 hover:text-white"
+                >
+                  📍 Open in Google Maps
+                </a>
               </div>
             </div>
           </div>

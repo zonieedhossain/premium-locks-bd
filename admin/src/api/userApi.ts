@@ -1,5 +1,6 @@
 import adminClient from './adminApi'
 import type { User, UserFormData } from '../types/user'
+import type { PaginatedResponse } from '../types/pagination'
 import { AxiosError } from 'axios'
 
 function handleError(err: unknown): never {
@@ -8,8 +9,8 @@ function handleError(err: unknown): never {
 }
 
 export const userApi = {
-  getAll: async (): Promise<User[]> => {
-    try { return (await adminClient.get<User[]>('/admin/users')).data ?? [] }
+  getAll: async (page = 1, limit = 10): Promise<PaginatedResponse<User>> => {
+    try { return (await adminClient.get<PaginatedResponse<User>>('/admin/users', { params: { page, limit } })).data }
     catch (err) { return handleError(err) }
   },
   getById: async (id: string): Promise<User> => {

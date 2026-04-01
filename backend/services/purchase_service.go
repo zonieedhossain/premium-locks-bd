@@ -30,11 +30,13 @@ func (s *PurchaseService) GetByID(id string) (*models.Purchase, error) {
 }
 
 type PurchaseInput struct {
-	SupplierName string
-	Items        []PurchaseItemInput
-	PaidAmount   float64
-	Note         string
-	CreatedBy    string
+	SupplierName  string
+	Items         []PurchaseItemInput
+	PaidAmount    float64
+	PaymentMethod string
+	TransactionID string
+	Note          string
+	CreatedBy     string
 }
 
 type PurchaseItemInput struct {
@@ -73,16 +75,18 @@ func (s *PurchaseService) Create(input PurchaseInput) (*models.Purchase, error) 
 
 	now := time.Now().UTC().Format(time.RFC3339)
 	purchase := models.Purchase{
-		ID:           uuid.NewString(),
-		SupplierName: input.SupplierName,
-		Items:        items,
-		TotalAmount:  total,
-		PaidAmount:   input.PaidAmount,
-		Status:       "pending",
-		Note:         input.Note,
-		CreatedBy:    input.CreatedBy,
-		CreatedAt:    now,
-		UpdatedAt:    now,
+		ID:            uuid.NewString(),
+		SupplierName:  input.SupplierName,
+		Items:         items,
+		TotalAmount:   total,
+		PaidAmount:    input.PaidAmount,
+		PaymentMethod: input.PaymentMethod,
+		TransactionID: input.TransactionID,
+		Status:        "pending",
+		Note:          input.Note,
+		CreatedBy:     input.CreatedBy,
+		CreatedAt:     now,
+		UpdatedAt:     now,
 	}
 
 	if err := s.purchaseRepo.Save(purchase); err != nil {

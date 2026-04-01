@@ -11,6 +11,10 @@ import Purchases from './pages/Purchases'
 import Sales from './pages/Sales'
 import Invoices from './pages/Invoices'
 import Reports from './pages/Reports'
+import SaleDetails from './pages/SaleDetails'
+import PurchaseDetails from './pages/PurchaseDetails'
+import InvoiceDetails from './pages/InvoiceDetails'
+import ProfitReport from './pages/ProfitReport'
 
 function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -32,9 +36,13 @@ export default function App() {
           <Route path="/products" element={<ProtectedRoute><AdminLayout><Products /></AdminLayout></ProtectedRoute>} />
           <Route path="/users" element={<ProtectedRoute><AdminLayout><Users /></AdminLayout></ProtectedRoute>} />
           <Route path="/purchases" element={<ProtectedRoute><AdminLayout><Purchases /></AdminLayout></ProtectedRoute>} />
+          <Route path="/purchases/:id" element={<ProtectedRoute><AdminLayout><PurchaseDetails /></AdminLayout></ProtectedRoute>} />
           <Route path="/sales" element={<ProtectedRoute><AdminLayout><Sales /></AdminLayout></ProtectedRoute>} />
+          <Route path="/sales/:id" element={<ProtectedRoute><AdminLayout><SaleDetails /></AdminLayout></ProtectedRoute>} />
           <Route path="/invoices" element={<ProtectedRoute><AdminLayout><Invoices /></AdminLayout></ProtectedRoute>} />
+          <Route path="/invoices/:id" element={<ProtectedRoute><AdminLayout><InvoiceDetails /></AdminLayout></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><AdminLayout><Reports /></AdminLayout></ProtectedRoute>} />
+          <Route path="/reports/profit" element={<ProtectedRoute><AdminLayout><ProfitReport /></AdminLayout></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><AdminLayout><Settings /></AdminLayout></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

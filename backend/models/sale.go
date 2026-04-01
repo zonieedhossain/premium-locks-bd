@@ -1,5 +1,8 @@
 package models
 
+// Bangladeshi Payment Methods:
+// "cash" | "bkash" | "nagad" | "rocket" | "bank_transfer" | "card" | "dbbl_nexus" | "upay"
+
 type Sale struct {
 	ID              string     `json:"id"`
 	InvoiceNumber   string     `json:"invoice_number"`
@@ -13,7 +16,8 @@ type Sale struct {
 	TaxAmount       float64    `json:"tax_amount"`
 	TotalAmount     float64    `json:"total_amount"`
 	PaidAmount      float64    `json:"paid_amount"`
-	PaymentMethod   string     `json:"payment_method"` // "cash" | "card" | "bank" | "whatsapp"
+	PaymentMethod   string     `json:"payment_method"`
+	TransactionID   string     `json:"transaction_id"` // bKash/Nagad/Rocket/Bank TrxID
 	Status          string     `json:"status"`         // "pending" | "completed" | "cancelled" | "refunded"
 	Note            string     `json:"note"`
 	CreatedBy       string     `json:"created_by"`
@@ -27,6 +31,7 @@ type SaleItem struct {
 	SKU         string  `json:"sku"`
 	Quantity    int     `json:"quantity"`
 	UnitPrice   float64 `json:"unit_price"`
+	CostPrice   float64 `json:"cost_price"` // COGS: product cost at time of sale
 	Discount    float64 `json:"discount"`
 	Subtotal    float64 `json:"subtotal"`
 }

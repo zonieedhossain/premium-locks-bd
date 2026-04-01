@@ -12,7 +12,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"premium-locks-bd/models"
 	"premium-locks-bd/services"
+	"premium-locks-bd/utils"
 )
 
 const maxUploadBytes = 5 << 20 // 5 MB
@@ -35,7 +37,11 @@ func (h *AdminProductHandler) GetAll(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, products)
+	page, limit := utils.ParsePagination(c)
+	data, total := utils.Paginate(products, page, limit)
+	c.JSON(http.StatusOK, models.PaginatedResponse[models.Product]{
+		Data: data, Total: total, Page: page, Limit: limit,
+	})
 }
 
 // GetByID — GET /api/admin/products/:id
@@ -133,6 +139,10 @@ func (h *AdminProductHandler) parseProductForm(c *gin.Context) (services.Product
 
 	stock, _ := strconv.Atoi(c.PostForm("stock_quantity"))
 	input.StockQuantity = stock
+
+	if cp := c.PostForm("cost_price"); cp != "" {
+		input.CostPrice, _ = strconv.ParseFloat(cp, 64)
+	}
 
 	input.IsActive = c.PostForm("is_active") == "true" || c.PostForm("is_active") == "1"
 

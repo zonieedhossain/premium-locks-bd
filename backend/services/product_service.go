@@ -82,6 +82,7 @@ type ProductInput struct {
 	ShortDescription string
 	Description      string
 	StockQuantity    int
+	CostPrice        float64
 	IsActive         bool
 	MainImage        string
 	GalleryImages    []string
@@ -112,6 +113,7 @@ func (s *ProductService) Create(input ProductInput) (*models.Product, error) {
 		ShortDescription: input.ShortDescription,
 		Description:      input.Description,
 		StockQuantity:    input.StockQuantity,
+		CostPrice:        input.CostPrice,
 		MainImage:        input.MainImage,
 		GalleryImages:    input.GalleryImages,
 		IsActive:         input.IsActive,
@@ -155,6 +157,7 @@ func (s *ProductService) Update(id string, input ProductInput) (*models.Product,
 		ShortDescription: input.ShortDescription,
 		Description:      input.Description,
 		StockQuantity:    input.StockQuantity,
+		CostPrice:        input.CostPrice,
 		MainImage:        mainImage,
 		GalleryImages:    gallery,
 		IsActive:         input.IsActive,

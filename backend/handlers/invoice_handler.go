@@ -5,7 +5,9 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"premium-locks-bd/models"
 	"premium-locks-bd/services"
+	"premium-locks-bd/utils"
 )
 
 type InvoiceHandler struct {
@@ -23,7 +25,11 @@ func (h *InvoiceHandler) GetAll(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, items)
+	page, limit := utils.ParsePagination(c)
+	data, total := utils.Paginate(items, page, limit)
+	c.JSON(http.StatusOK, models.PaginatedResponse[models.Invoice]{
+		Data: data, Total: total, Page: page, Limit: limit,
+	})
 }
 
 // POST /api/admin/invoices/sale/:saleId

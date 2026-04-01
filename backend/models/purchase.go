@@ -1,16 +1,18 @@
 package models
 
 type Purchase struct {
-	ID           string         `json:"id"`
-	SupplierName string         `json:"supplier_name"`
-	Items        []PurchaseItem `json:"items"`
-	TotalAmount  float64        `json:"total_amount"`
-	PaidAmount   float64        `json:"paid_amount"`
-	Status       string         `json:"status"` // "pending" | "received" | "cancelled"
-	Note         string         `json:"note"`
-	CreatedBy    string         `json:"created_by"`
-	CreatedAt    string         `json:"created_at"`
-	UpdatedAt    string         `json:"updated_at"`
+	ID            string         `json:"id"`
+	SupplierName  string         `json:"supplier_name"`
+	Items         []PurchaseItem `json:"items"`
+	TotalAmount   float64        `json:"total_amount"`
+	PaidAmount    float64        `json:"paid_amount"`
+	PaymentMethod string         `json:"payment_method"` // "cash" | "bkash" | "nagad" | "rocket" | "bank_transfer" | "card"
+	TransactionID string         `json:"transaction_id"` // bKash/Nagad/Rocket/Bank TrxID
+	Status        string         `json:"status"`         // "pending" | "received" | "cancelled"
+	Note          string         `json:"note"`
+	CreatedBy     string         `json:"created_by"`
+	CreatedAt     string         `json:"created_at"`
+	UpdatedAt     string         `json:"updated_at"`
 }
 
 type PurchaseItem struct {
